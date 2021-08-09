@@ -6,7 +6,9 @@ function log_access($log_dir=null) {
 
 	$log_dir = !is_null($log_dir) ? rtrim($log_dir,'/')  : __DIR__ .'/access';
 
-	$access_log = $log_dir .'/'.date("Ymd",time()+28800).'.log';
+	$local_ts = time() + 28800;
+
+	$access_log = $log_dir .'/'.date("Ymd",$local_ts).'.log';
 
 	if(!is_dir(dirname($access_log))) {
 		mkdir(dirname($access_log),0755,true);
@@ -31,7 +33,7 @@ function log_access($log_dir=null) {
 	];
 
 	$messages_arr = [
-		'local_time'=>date("H:i:s",time()+28800),
+		'local_time'=>date("H:i:s",$local_ts),
 		'user_ip'=> isset($_SERVER['HTTP_CDN_SRC_IP'])? $_SERVER['HTTP_CDN_SRC_IP'] : $_SERVER['REMOTE_ADDR'].'(directly)',
 		'request_method'=>$_SERVER['REQUEST_METHOD'],
 		'user_agent'=> $_SERVER['HTTP_USER_AGENT'],
@@ -47,9 +49,10 @@ function log_access($log_dir=null) {
 	if(isset($_POST) && !empty($_POST) ){
 		$messages_arr['post_args'] = http_build_query($_POST);
 	}
-	file_put_contents($access_log,implode(' - ', $messages_arr ) . PHP_EOL,FILE_APPEND);
+
 
 	if($messages_arr['allow'] == 'block'){
+		file_put_contents($access_log,implode(' - ', $messages_arr ) . PHP_EOL,FILE_APPEND);
 		exit();
 	}
 
