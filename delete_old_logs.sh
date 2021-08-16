@@ -10,6 +10,6 @@ if [ ! -f $CONFIG ];then
 fi
 source $CONFIG
 
-find ${ACCESS_LOG_DIR} -type f  -name "*.log"  -mtime +${EXPIRE_LOG_DAYS} | xargs rm -rf
+find ${ACCESS_LOG_DIR} -type f  -name "*.log"  -mtime ${EXPIRE_LOG_DAYS} | xargs rm -rf
 
 
