@@ -29,8 +29,15 @@ function log_access($log_dir=null) {
 		'18.234.202.160',
 		'52.55.227.18',
         '35.201.206.6',
-
+		'47.243.198.134',
+		'124.156.166.170',
+		'95.217.7.161',
+		'35.203.254.46',
+		'13.229.208.88',
+		'83.145.252.169',
+		'202.39.156.137',
 	];
+	
 
 	$messages_arr = [
 		'local_time'=>date("H:i:s",$local_ts),
@@ -51,8 +58,15 @@ function log_access($log_dir=null) {
 	}
 
 
+	file_put_contents($access_log,implode(' - ', $messages_arr ) . PHP_EOL,FILE_APPEND);
+
+/*	if(strpos($messages_arr['user_ip'],'directly')===false){
+		exit();
+	}
+*/
+
+	
 	if($messages_arr['allow'] == 'block'){
-		file_put_contents($access_log,implode(' - ', $messages_arr ) . PHP_EOL,FILE_APPEND);
 		exit();
 	}
 
