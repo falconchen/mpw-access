@@ -36,6 +36,13 @@ function log_access($log_dir=null) {
 		'13.229.208.88',
 		'83.145.252.169',
 		'202.39.156.137',
+		'45.57.148.21',
+				
+	];
+	
+	$black_ip_groups = [
+		'64.64.102.',
+		'196.16.82.',
 	];
 	
 
@@ -52,7 +59,17 @@ function log_access($log_dir=null) {
 
 	if(in_array($messages_arr['user_ip'],$black_ips)) {
 		$messages_arr['allow'] = 'block';
+	}else{
+
+		foreach($black_ip_groups as $ip_start){
+			if(strpos($messages_arr['user_ip'],$ip_start) === 0){
+				$messages_arr['allow'] = 'block';
+			}
+		}
+
 	}
+
+
 	if(isset($_POST) && !empty($_POST) ){
 		$messages_arr['post_args'] = http_build_query($_POST);
 	}
