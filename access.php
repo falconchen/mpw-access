@@ -37,12 +37,16 @@ function log_access($log_dir=null) {
 		'83.145.252.169',
 		'202.39.156.137',
 		'45.57.148.21',
+		'104.233.179.113',	
 				
 	];
 	
 	$black_ip_groups = [
 		'64.64.102.',
 		'196.16.82.',
+		'47.91.255.',
+		'101.32.36.',
+		'94.74.112.',
 	];
 	
 
@@ -58,12 +62,12 @@ function log_access($log_dir=null) {
 
 
 	if(in_array($messages_arr['user_ip'],$black_ips)) {
-		$messages_arr['allow'] = 'block';
+		$messages_arr['allow'] = 'blocked';
 	}else{
 
 		foreach($black_ip_groups as $ip_start){
 			if(strpos($messages_arr['user_ip'],$ip_start) === 0){
-				$messages_arr['allow'] = 'block';
+				$messages_arr['allow'] = 'blocked';
 			}
 		}
 
@@ -83,7 +87,7 @@ function log_access($log_dir=null) {
 */
 
 	
-	if($messages_arr['allow'] == 'block'){
+	if($messages_arr['allow'] == 'blocked'){
 		exit();
 	}
 
