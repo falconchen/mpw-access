@@ -45,6 +45,8 @@ function log_access($log_dir=null) {
 		'104.239.248.101',
 		'129.226.172.206',
 		'78.47.26.119',
+		'110.249.208.135',
+		'43.249.36.39',
 				
 	];
 	
@@ -63,12 +65,20 @@ function log_access($log_dir=null) {
 		'65.108.',
 		'95.216.',
 		'95.217.',
+		'20.69.242.',
 	];
 	
+	if(isset($_SERVER['HTTP_CF_CONNECTING_IP'])){
+	    $user_ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
+	}elseif(isset($_SERVER['HTTP_CDN_SRC_IP'])){
+	    $user_ip = $_SERVER['HTTP_CDN_SRC_IP'];
+	}else{
+	    $user_ip = $_SERVER['REMOTE_ADDR'].'(directly)';
+	}
 
 	$messages_arr = [
 		'local_time'=>date("H:i:s",$local_ts),
-		'user_ip'=> isset($_SERVER['HTTP_CDN_SRC_IP'])? $_SERVER['HTTP_CDN_SRC_IP'] : $_SERVER['REMOTE_ADDR'].'(directly)',
+		'user_ip'=>$user_ip, 
 		'request_method'=>$_SERVER['REQUEST_METHOD'],
 		'user_agent'=> $_SERVER['HTTP_USER_AGENT'],
 		'request_uri'=>$_SERVER['REQUEST_URI'],
@@ -104,7 +114,9 @@ function log_access($log_dir=null) {
 
 	
 	if($messages_arr['allow'] == 'blocked'){
-		exit();
+		 header('HTTP/1.1 404 Not Found');
+		 header("status: 404 Not Found");
+		 exit();
 	}
 
 }
