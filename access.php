@@ -47,6 +47,7 @@ function log_access($log_dir=null) {
 		'78.47.26.119',
 		'110.249.208.135',
 		'43.249.36.39',
+		'146.247.137.99',
 				
 	];
 	
@@ -66,6 +67,8 @@ function log_access($log_dir=null) {
 		'95.216.',
 		'95.217.',
 		'20.69.242.',
+		'154.37.',
+		'154.9.',
 	];
 	
 	if(isset($_SERVER['HTTP_CF_CONNECTING_IP'])){
