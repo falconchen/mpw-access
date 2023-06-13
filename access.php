@@ -2,7 +2,6 @@
 //ini_set('display_errors', 1);
 //exit();
 
-date_default_timezone_set("UTC");
 
 function log_access($log_dir=null) {
 
@@ -15,8 +14,13 @@ function log_access($log_dir=null) {
 	if(!is_dir(dirname($access_log))) {
 		mkdir(dirname($access_log),0755,true);
 	}
+	
 	$black_ips = [
+		
 		//'149.129.68.64', //for test only
+		
+		'180.235.169.21',
+		'64.124.8.28',		
 		'210.61.46.124',
 		'112.120.122.191',	
 		'38.108.108.178',
@@ -82,12 +86,25 @@ function log_access($log_dir=null) {
 		'185.234.7.116',
 		'34.80.33.211',
 		'154.38.26.97',
+		'5.255.98.156',
+		'223.19.122.71',
+		'123.203.8.126',
+		'185.107.70.56',
+		'185.130.47.58',
+		'210.177.253.130',
+		'14.136.255.83',
+		'59.148.180.180',
 	];
 	
 	$black_ip_groups = [
-
-		//'66.249.79.',//google clawer
-		//'66.249.64.',//google clawer2
+		#'66.249.66.',//google clawer
+		#'66.249.79.',//google clawer
+		#'66.249.64.',//google clawer2
+		#'74.125.215.',//google producer
+        '67.222.158.',
+		'64.124.8.',
+		'64.62.243.',
+		'107.178.200.',
 		'42.98.49.',
 		'185.206.128.',
 		'5.62.62.',
@@ -134,6 +151,9 @@ function log_access($log_dir=null) {
 		'14.0.154.',
 		'167.114.103.',
 		'191.101.',
+		'45.195.74.',
+		'210.3.196.',
+		//'173.252.', //facebookexternalhit
 		
 	];
 	
@@ -173,6 +193,10 @@ function log_access($log_dir=null) {
 		$messages_arr['post_args'] = http_build_query($_POST);
 	}
 
+#	if(isset($_REQUEST['action']) && $_REQUEST['action'] == 'pvc-check-post'){
+#	   $message_arr['allow'] = 'blocked';
+#		exit;
+#	}
 
 	file_put_contents($access_log,implode(' - ', $messages_arr ) . PHP_EOL,FILE_APPEND);
 
@@ -189,4 +213,38 @@ function log_access($log_dir=null) {
 	}
 
 }
+
+function limit_fb($log_dir=null){
+
+	$log_dir = !is_null($log_dir) ? rtrim($log_dir,'/')  : __DIR__ .'/access';
+	if( !empty( $_SERVER['HTTP_USER_AGENT'] ) && strpos(  $_SERVER['HTTP_USER_AGENT'], 'facebookexternalhit' ) === 0 ) {
+		$fbTmpFile = $log_dir.'/facebookexternalhit.txt';
+		if( $fh = fopen( $fbTmpFile, 'c+' ) ) {
+			$lastTime = fread( $fh, 100 );
+			$microTime = microtime( TRUE );
+			// check current microtime with microtime of last access
+			if( $microTime - $lastTime < FACEBOOK_REQUEST_THROTTLE ) {
+				// bail if requests are coming too quickly with http 503 Service Unavailable
+				header( $_SERVER["SERVER_PROTOCOL"].' 503' );
+				die;
+			} else {
+				// write out the microsecond time of last access
+				rewind( $fh );
+				fwrite( $fh, $microTime );
+			}
+			fclose( $fh );
+		} else {
+			header( $_SERVER["SERVER_PROTOCOL"].' 429' );
+			die;
+		}
+	}
+
+}
+
+
+date_default_timezone_set("UTC");
+define( 'FACEBOOK_REQUEST_THROTTLE', 2.0 ); // Number of seconds permitted between each hit from facebookexternalhit
+limit_fb();
 log_access();
+
+
