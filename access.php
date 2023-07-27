@@ -17,7 +17,7 @@ function log_access($log_dir=null) {
 	
 	$black_ips = [
 		
-		//'149.129.68.64', //for test only
+		//'43.154.73.172', //for test only
 		
 		'180.235.169.21',
 		'64.124.8.28',		
@@ -94,14 +94,40 @@ function log_access($log_dir=null) {
 		'210.177.253.130',
 		'14.136.255.83',
 		'59.148.180.180',
+		'185.213.82.245',
+		'223.16.43.107',
+		'122.100.164.99',
+		'14.199.216.249',
+		'58.176.228.162',
+		'109.239.229.234',
+		'14.136.255.174',
+		'38.18.13.163',
+		'134.73.50.195',
 	];
 	
 	$black_ip_groups = [
-		#'66.249.66.',//google clawer
-		#'66.249.79.',//google clawer
-		#'66.249.64.',//google clawer2
-		#'74.125.215.',//google producer
+		#'66.249.',//google clawer
+
+		'74.125.215.',//google producer
+		'64.233.172.',//google producer2,
+		'140.238.94.',
+
+        '34.245.62.',
+		'176.34.149.',
+		'54.74.228.',
+		'3.250.134.',
+		'34.245.62.',
+		
+		'185.191.171.',
+		'132.145.',
+		'18.232.112.',
+		'54.36.148.',
+		'34.86.177.',
+		'35.153.158.',
+		'152.67.138.',
+		'54.36.149.',
         '67.222.158.',
+		'47.91.225.',
 		'64.124.8.',
 		'64.62.243.',
 		'107.178.200.',
@@ -209,6 +235,8 @@ function log_access($log_dir=null) {
 	if($messages_arr['allow'] == 'blocked'){
 		 header('HTTP/1.1 404 Not Found');
 		 header("status: 404 Not Found");
+
+		 #header( $_SERVER["SERVER_PROTOCOL"].' 503' );
 		 exit();
 	}
 
@@ -240,11 +268,42 @@ function limit_fb($log_dir=null){
 	}
 
 }
+function limit_gb($log_dir=null){
+
+
+	$log_dir = !is_null($log_dir) ? rtrim($log_dir,'/')  : __DIR__ .'/access';
+	if( !empty( $_SERVER['HTTP_USER_AGENT'] ) && stripos(  $_SERVER['HTTP_USER_AGENT'], 'googlebot' ) !==false ) {
+		$fbTmpFile = $log_dir.'/googlebot.txt';
+		if( $fh = fopen( $fbTmpFile, 'c+' ) ) {
+			$lastTime = fread( $fh, 100 );
+			$microTime = microtime( TRUE );
+			// check current microtime with microtime of last access
+			if( $microTime - $lastTime < GB_REQUEST_THROTTLE ) {
+				// bail if requests are coming too quickly with http 503 Service Unavailable
+				header( $_SERVER["SERVER_PROTOCOL"].' 503' );
+				die;
+			} else {
+				// write out the microsecond time of last access
+				rewind( $fh );
+				fwrite( $fh, $microTime );
+			}
+			fclose( $fh );
+		} else {
+			header( $_SERVER["SERVER_PROTOCOL"].' 429' );
+			die;
+		}
+	}
+
+}
+
 
 
 date_default_timezone_set("UTC");
 define( 'FACEBOOK_REQUEST_THROTTLE', 2.0 ); // Number of seconds permitted between each hit from facebookexternalhit
 limit_fb();
+define( 'GB_REQUEST_THROTTLE', 2.0 ); // Number of seconds permitted between each hit from googlebot
+limit_gb();
+log_access();
 log_access();
 
 
