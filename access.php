@@ -18,6 +18,7 @@ function log_access($log_dir=null) {
 	$black_ips = [
 		
 		//'43.154.73.172', //for test only
+		'42.200.195.84',
 		
 		'180.235.169.21',
 		'64.124.8.28',		
@@ -300,10 +301,9 @@ function limit_gb($log_dir=null){
 
 date_default_timezone_set("UTC");
 define( 'FACEBOOK_REQUEST_THROTTLE', 2.0 ); // Number of seconds permitted between each hit from facebookexternalhit
-limit_fb();
 define( 'GB_REQUEST_THROTTLE', 2.0 ); // Number of seconds permitted between each hit from googlebot
+limit_fb();
 limit_gb();
-log_access();
 log_access();
 
 
